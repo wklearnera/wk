@@ -2,9 +2,9 @@
   <el-container>
     <!-- 头部 -->
     <el-header>
-      <div>
+      <div class="logobox">
         <img
-          src="../assets/heima.png"
+          src="../assets/logo.png"
           alt=""
         >
         <span>电商后台管理系统</span>
@@ -161,5 +161,14 @@ export default {
   color: #fff;
   letter-spacing: 0.2em;
   cursor: pointer;
+}
+.logobox{
+  height: 80%;
+  width: 30%
+}
+.logobox img{
+  width: 15%;
+  height: 100%;
+  border-radius: 50%;
 }
 </style>

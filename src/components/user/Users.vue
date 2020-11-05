@@ -89,7 +89,7 @@
                 trigger="click"
                 :ref="`popover-${scope.$index}`"
               >
-                <p>这是一段内容这是一段内容确定删除吗？</p>
+                <p>确定删除吗？</p>
                 <div style="text-align: right; margin: 0">
                   <el-button
                     size="mini"
@@ -124,6 +124,7 @@
                   icon="el-icon-setting"
                   circle
                   size="mini"
+                  @click="setRole(scope.row)"
                 ></el-button>
               </el-tooltip>
             </template>
@@ -230,6 +231,37 @@
           >确 定</el-button>
           </span>
         </el-dialog>
+        <!-- 分配角色对话框 -->
+        <el-dialog
+          title="分配角色"
+          :visible.sync="SetRoleDialogVisible"
+          width="50%"
+        >
+          <div>
+            <p>当前的用户：{{userInfo.username}}</p>
+            <p>当前的角色：{{userInfo.role_name}}</p>
+            <p>分配新角色：
+              <el-select
+                v-model="selectedRoleId"
+                placeholder="请选择"
+              >
+                <el-option
+                  v-for="item in rolesList"
+                  :key="item.id"
+                  :label="item.roleName"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </p>
+          </div>
+          <el-button @click="SetRoleDialogVisible = false">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="saveRoleInfo"
+          >确 定</el-button>
+          </span>
+        </el-dialog>
       </div>
     </el-card>
   </div>
@@ -306,6 +338,14 @@ export default {
           { validator: checkMobile, trigger: 'blur' }
         ],
       },
+      // 分配角色
+      SetRoleDialogVisible: false,
+      // 需要被分配角色的用户信息
+      userInfo: {},
+      //所有角色的数据列表
+      rolesList: [],
+      //已经选中的角色id
+      selectedRoleId: ''
     }
   },
   created() {
@@ -346,7 +386,7 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return this.$message.error('数据输入有误');
         const { data: ref } = await this.$http.post('users', this.addForm)
-        if (ref.status !== 201) {
+        if (ref.meta.status !== 201) {
           return this.$message.error(res.meta.msg)
         }
         this.$message.success(ref.meta.msg)
@@ -385,7 +425,6 @@ export default {
     // 确认框关闭
     deletePopoverClose(scope) {
       scope._self.$refs[`popover-${scope.$index}`].doClose();
-      console.log(scope.row);
     },
     // 确认删除操作 this指向组件实例
     async deleteUser(scope) {
@@ -396,13 +435,39 @@ export default {
       this.$message.success('删除成功')
       this.deletePopoverClose(scope)
       this.getUserList()
+    },
+    // 展示分配角色对话框
+    async setRole(userInfo) {
+      this.userInfo = userInfo
+
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败')
+      }
+
+      this.rolesList = res.data
+
+      this.SetRoleDialogVisible = true
+    },
+    // 点击按钮分配角色
+    async saveRoleInfo() {
+      if (!this.selectedRoleId) {
+        return this.$message.error('请选择要分配的角色')
+      }
+
+      const { data: res } = await this.$http.put(`users/${this.userInfo.id}/role`,
+        { rid: this.selectedRoleId }
+      )
+      if (this.$message.meta !== 200) {
+        this.$message.error('更新失败')
+      }
+      this.$message.success('更新角色成功')
+      this.getUserList()
+      this.SetRoleDialogVisible = false
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.el-button {
-  margin-right: 10px;
-}
 </style>

@@ -2,9 +2,10 @@ import Vue from 'vue'
 import {
     Button, Form, FormItem, Input, Message,
     Container, Header, Aside, Main, Menu,
-    Submenu, MenuItemGroup, MenuItem,Tooltip,
-    Breadcrumb, BreadcrumbItem, Card,Pagination,
-    Row, Col, Table, TableColumn,Switch,Dialog,Popover
+    Submenu, MenuItemGroup, MenuItem,Tooltip,MessageBox,
+    Breadcrumb, BreadcrumbItem, Card,Pagination,Tag,Tree,
+    Row, Col, Table, TableColumn,Switch,Dialog,Popover,Select,
+    Option
 } from 'element-ui'
 
 Vue.use(Button)
@@ -31,6 +32,11 @@ Vue.use(Tooltip)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Popover)
+Vue.use(Tag)
+Vue.use(Tree)
+Vue.use(Select)
+Vue.use(Option)
 
 // 把弹框组件挂载到vue的原型对象上 只要访问到$message就可以访问到message组件
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm
