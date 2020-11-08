@@ -24,3 +24,11 @@ html,body,#app{
 .el-button{
     margin-right: 15px;
 }
+
+.el-cascader-panel {
+    height: 300px;
+  }
+
+.qul-editor {
+    min-height: 300px;
+}

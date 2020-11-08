@@ -6,6 +6,10 @@ import Users from '../components/user/Users.vue'
 import Welcome from '../components/Welcome.vue'
 import Rights from '../components/power/Rights.vue'
 import Roles from '../components/power/Roles.vue'
+import Goods from '../components/goods/Goods.vue'
+import Add from '../components/goods/Add.vue'
+import Cate from '../components/goods/Cate.vue'
+import Params from '../components/goods/Params.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -18,7 +22,11 @@ const routes = [
     { path: '/welcome', component: Welcome},
     { path: '/users', component: Users},
     { path: '/rights', component: Rights},
-    { path: '/roles', component: Roles}
+    { path: '/roles', component: Roles},
+    { path: '/goods', component: Goods},
+    { path: '/goods/add', component: Add},
+    { path: '/categories', component: Cate},
+    { path: '/params', component: Params}
   ],
 }
 ]
@@ -31,7 +39,7 @@ const router = new VueRouter({
 router.beforeEach((to,from,next) => {
   // to想要访问的路径
   // from 从哪个路径跳转而来
-  // next 函数表示放行
+  // next 函数表示放行    
   // next() 放行 next('/login') 强制跳转
   if(to.path === '/login') return next();
   // 获取token

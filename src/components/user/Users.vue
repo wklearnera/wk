@@ -293,7 +293,7 @@ export default {
         //当前页数
         pagenum: 1,
         //当前页面大小
-        pagesize: 2
+        pagesize: 5
       },
       userlist: [],
       total: 0,
