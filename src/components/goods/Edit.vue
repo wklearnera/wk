@@ -89,15 +89,14 @@
               label="商品分类"
               prop="goods_cat"
             >
-              <!-- 级联选择器 -->
-              <el-cascader
-                expand-trigger="hover"
-                :options="catelist"
-                :props="cateProps"
-                v-model="addForm.goods_cat"
-                @change="handleChange"
+              <el-input
+                class="cat_input"
+                disabled
+                suffix-icon="el-icon-arrow-down"
+                v-model="queryGoods"
               >
-              </el-cascader>
+
+              </el-input>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane
@@ -191,6 +190,12 @@ import _ from 'lodash'
 export default {
   data() {
     return {
+      // 参数id
+      // cateId:'',
+      // 商品id
+      queryGoods: '',
+      queryGoodsArry: [],
+      // 商品分类
       activeIndex: '0',
       // 添加商品的表单数据对象
       addForm: {
@@ -219,9 +224,6 @@ export default {
         goods_number: [
           { required: true, message: '请输入商品数量', trigger: 'blur' }
         ],
-        goods_cat: [
-          { required: true, message: '请选择商品分类', trigger: 'blur' }
-        ]
       },
       // 商品分类列表
       catelist: [],
@@ -241,29 +243,54 @@ export default {
         Authorization: window.sessionStorage.getItem('token')
       },
       previewPath: '',
-      previewVisible: false
-      
+      previewVisible: false,
+      fileList: [],
+      // fileList2: [{ name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }, { name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }],
+      fileobj: {
+        name: '',
+        url: ''
+      }
     }
   },
   created() {
-    this.getCateList()
+    this.getGoodsInfo()
   },
   methods: {
-    // 获取所有商品分类数据
-    async getCateList() {
-      const { data: res } = await this.$http.get('categories')
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取商品分类数据失败！')
-      }
-      this.catelist = res.data
-      console.log(this.catelist)
-      console.log(res);
+    // 通过id获取商品信息
+    async getGoodsInfo() {
+      // 获取到上一页面传递id
+      this.queryGoodsId = this.$route.query.id
+      // 根据id查询商品
+      const { data: goods_res } = await this.$http.get(`goods/${this.queryGoodsId}`)
+      console.log(goods_res);
+
+      // 商品信息填写
+      this.addForm.goods_name = goods_res.data.goods_name
+      this.addForm.goods_price = goods_res.data.goods_price
+      this.addForm.goods_weight = goods_res.data.goods_weight
+      this.addForm.goods_number = goods_res.data.goods_number
+      this.addForm.goods_cat = goods_res.data.goods_cat.split(",")
+      //商品图片处理
+      // goods_res.data.pics.forEach(item=> {
+      //   this.fileobj.name = item.name
+      //   this.fileobj.url = item.mid_url
+      //   this.fileList.push(this.fileobj)
+      // })
+      this.addForm.pics = goods_res.data.pics
+      // this.fileList = goods_res.data.pics
+      // 商品分类处理
+      this.getCateById()
+      // 商品属性填写
+      // this.manyTableData = goods_res.data.attrs
     },
-    // 级联选择器选中项变化，会触发这个函数
-    handleChange() {
-      if (this.addForm.goods_cat.length !== 3) {
-        this.addForm.goods_cat = []
-      }
+    // 根据id获取分类信息 分类id
+    getCateById() {
+      this.addForm.goods_cat.forEach(async item => {
+        // 根据id获取分类信息 分类id
+        var { data: cate_res } = await this.$http.get(`categories/${item}`)
+        this.queryGoodsArry.push(cate_res.data.cat_name)
+        this.queryGoods = this.queryGoodsArry.join('/')
+      })
     },
     beforeTabLeave(activeName, oldActiveName) {
       // console.log('即将离开的标签页名字是：' + oldActiveName)
@@ -302,7 +329,6 @@ export default {
             params: { sel: 'only' }
           }
         )
-
         if (res.meta.status !== 200) {
           return this.$message.error('获取静态属性失败！')
         }
@@ -326,7 +352,6 @@ export default {
       const i = this.addForm.pics.findIndex(x => x.pic === filePath)
       // 3. 调用数组的 splice 方法，把图片信息对象，从 pics 数组中移除
       this.addForm.pics.splice(i, 1)
-      console.log(this.addForm)
     },
     // 监听图片上传成功的事件
     handleSuccess(response) {
@@ -368,7 +393,7 @@ export default {
         }
         this.$message.success('添加商品成功！')
         this.$router.push('/goods')
-      })    
+      })
     }
   },
   computed: {
@@ -393,5 +418,9 @@ export default {
 
 .btnAdd {
   margin-top: 15px;
+}
+
+.cat_input {
+  width: 300px;
 }
 </style>

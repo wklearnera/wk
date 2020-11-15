@@ -59,7 +59,7 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
-              @click="goAddpage"
+              @click="goEditpage(scope.row.goods_id)"
             >编辑</el-button>
             <el-button
               type="danger"
@@ -147,8 +147,11 @@ export default {
     },
     // 跳转到添加页面；。 
     goAddpage() {
-      console.log("qaa");
       this.$router.push('/goods/add')
+    },
+    // 跳转到edit页面
+    goEditpage(goods_id) {
+      this.$router.push({path:'/goods/edit',query:{id:goods_id}})
     }
   },
 }
